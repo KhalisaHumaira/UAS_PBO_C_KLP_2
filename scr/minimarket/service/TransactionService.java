@@ -129,3 +129,19 @@ public class TransactionService {
             System.out.println("Error generate laporan: " + e.getMessage());
         }
     }
+
+    /**
+     * Mendapatkan total pendapatan
+     * @return Total pendapatan
+     */
+    public int getTotalRevenue() {
+        try {
+            return transactions.stream()
+                    .mapToInt(Transaction::getTotalPrice)
+                    .sum();
+        } catch (Exception e) {
+            System.out.println("Error get total revenue: " + e.getMessage());
+            return 0;
+        }
+    }
+}

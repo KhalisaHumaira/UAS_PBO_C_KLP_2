@@ -66,4 +66,23 @@ public class AuthService {
             System.out.println("Error saat login: " + e.getMessage());
             return null;
         }
-    } k
+    } 
+    
+    /**
+     * Mendapatkan semua user
+     * @return List user
+     */
+    public List<User> getAllUsers() {
+        return new ArrayList<>(users.values());
+    }
+
+    /**
+     * Mendapatkan user berdasarkan username
+     * @param username Username
+     * @return User object
+     */
+    public User getUserByUsername(String username) {
+        return users.get(username);
+    }
+}
+

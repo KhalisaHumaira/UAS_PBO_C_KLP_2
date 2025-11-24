@@ -594,3 +594,23 @@ public class Main {
         
         CLIHelper.pressEnter();
     }
+    /**
+     * Lihat riwayat transaksi user
+     */
+    private static void viewUserTransactions() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("RIWAYAT TRANSAKSI");
+        
+        List<Transaction> transactions = transactionService.getTransactionsByUser(currentUser.getUsername());
+        
+        if (transactions.isEmpty()) {
+            System.out.println("Belum ada transaksi.");
+        } else {
+            for (Transaction t : transactions) {
+                t.displayInvoice();
+                CLIHelper.printSeparator();
+            }
+        }
+        CLIHelper.pressEnter();
+    }
+}

@@ -79,3 +79,17 @@ public class Product {
         }
         this.stock -= quantity;
     }
+     /**
+     * Method untuk menambah stok produk
+     * @param quantity Jumlah yang ditambahkan
+     */
+    public void addStock(int quantity) {
+        this.stock += quantity;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s - %s (Rp %d)", id, name, price);
+    }
+}
+

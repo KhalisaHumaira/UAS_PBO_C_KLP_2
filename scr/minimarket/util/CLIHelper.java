@@ -67,3 +67,28 @@ public class CLIHelper {
         sb.append(text);
         return sb.toString();
     }
+
+ /**
+     * Pause program
+     */
+    public static void pressEnter() {
+        System.out.println("\nTekan Enter untuk melanjutkan...");
+        scanner.nextLine();
+    }
+
+    public static void printSuccess(String message) {
+        System.out.println("[SUCCESS] " + message);
+    }
+
+    public static void printError(String message) {
+        System.out.println("[ERROR] " + message);
+    }
+
+    public static void printWarning(String message) {
+        System.out.println("[WARNING] " + message);
+    }
+
+    public static void printInfo(String message) {
+        System.out.println("[INFO] " + message);
+    }
+}

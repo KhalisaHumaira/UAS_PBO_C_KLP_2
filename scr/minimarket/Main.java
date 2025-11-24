@@ -371,3 +371,226 @@ public class Main {
         }
         CLIHelper.pressEnter();
     }
+    /**
+     * Cari produk
+     */
+    private static void searchProduct() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("CARI PRODUK");
+        
+        try {
+            System.out.print("Masukkan nama produk: ");
+            String keyword = scanner.nextLine();
+            
+            List<Product> results = productService.searchProducts(keyword);
+            
+            if (results.isEmpty()) {
+                System.out.println("\nProduk tidak ditemukan!");
+            } else {
+                System.out.println("\nHasil pencarian:");
+                System.out.printf("%-10s %-20s %-12s %-10s %-15s%n", 
+                    "ID", "Nama", "Harga", "Stok", "Kategori");
+                CLIHelper.printSeparator();
+                for (Product p : results) {
+                    System.out.printf("%-10s %-20s Rp%-10d %-10d %-15s%n",
+                        p.getId(), p.getName(), p.getPrice(), p.getStock(), p.getCategory());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        CLIHelper.pressEnter();
+    }
+
+    /**
+     * Lihat semua transaksi
+     */
+    private static void viewAllTransactions() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("SEMUA TRANSAKSI");
+        
+        List<Transaction> transactions = transactionService.getAllTransactions();
+        
+        if (transactions.isEmpty()) {
+            System.out.println("Belum ada transaksi.");
+        } else {
+            for (Transaction t : transactions) {
+                t.displayInvoice();
+                CLIHelper.printSeparator();
+            }
+        }
+        CLIHelper.pressEnter();
+    }
+
+    /**
+     * Lihat laporan penjualan
+     */
+    private static void viewSalesReport() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("LAPORAN PENJUALAN");
+        
+        transactionService.generateSalesReport();
+        CLIHelper.pressEnter();
+    }
+
+    /**
+     * Lihat semua user
+     */
+    private static void viewAllUsers() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("DATA USER");
+        
+        List<User> users = authService.getAllUsers();
+        
+        System.out.printf("%-15s %-20s %-10s%n", "Username", "Nama", "Role");
+        CLIHelper.printSeparator();
+        for (User u : users) {
+            String role = u instanceof Admin ? "Admin" : "User";
+            System.out.printf("%-15s %-20s %-10s%n", 
+                u.getUsername(), u.getName(), role);
+        }
+        CLIHelper.pressEnter();
+    }
+
+    /**
+     * Menu untuk User
+     */
+    private static void showUserMenu() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("MENU USER - " + currentUser.getName());
+        System.out.println("1. Lihat Produk");
+        System.out.println("2. Belanja");
+        System.out.println("3. Riwayat Transaksi");
+        System.out.println("4. Cari Produk");
+        System.out.println("5. Logout");
+        CLIHelper.printSeparator();
+        
+        try {
+            System.out.print("Pilih menu: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice) {
+                case 1:
+                    viewAllProducts();
+                    break;
+                case 2:
+                    shopping();
+                    break;
+                case 3:
+                    viewUserTransactions();
+                    break;
+                case 4:
+                    searchProduct();
+                    break;
+                case 5:
+                    currentUser = null;
+                    System.out.println("Logout berhasil!");
+                    CLIHelper.pressEnter();
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid!");
+                    CLIHelper.pressEnter();
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Input harus berupa angka!");
+            scanner.nextLine();
+            CLIHelper.pressEnter();
+        }
+    }
+
+    /**
+     * Proses belanja
+     */
+    private static void shopping() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("BELANJA");
+        
+        Transaction transaction = new Transaction(
+            "TRX" + System.currentTimeMillis(), 
+            currentUser.getUsername()
+        );
+        
+        while (true) {
+            try {
+                viewAllProducts();
+                
+                System.out.print("\nID Produk (0 untuk selesai): ");
+                String productId = scanner.nextLine();
+                
+                if (productId.equals("0")) break;
+                
+                Product product = productService.getProductById(productId);
+                if (product == null) {
+                    System.out.println("Produk tidak ditemukan!");
+                    CLIHelper.pressEnter();
+                    continue;
+                }
+                
+                System.out.print("Jumlah: ");
+                int quantity = scanner.nextInt();
+                scanner.nextLine();
+                
+                if (quantity > product.getStock()) {
+                    System.out.println("Stok tidak mencukupi! Stok tersedia: " + product.getStock());
+                    CLIHelper.pressEnter();
+                    continue;
+                }
+                
+                TransactionItem item = new TransactionItem(product, quantity);
+                transaction.addItem(item);
+                
+                System.out.println("\nProduk ditambahkan ke keranjang!");
+                CLIHelper.pressEnter();
+                
+            } catch (InputMismatchException e) {
+                System.out.println("Input tidak valid!");
+                scanner.nextLine();
+                CLIHelper.pressEnter();
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+                CLIHelper.pressEnter();
+            }
+        }
+        
+        if (transaction.getItems().isEmpty()) {
+            System.out.println("Tidak ada produk yang dibeli!");
+            CLIHelper.pressEnter();
+            return;
+        }
+        
+        // Proses pembayaran
+        CLIHelper.clearScreen();
+        transaction.displayInvoice();
+        
+        System.out.print("\nMasukkan jumlah uang: Rp ");
+        try {
+            int payment = scanner.nextInt();
+            scanner.nextLine();
+            
+            if (payment < transaction.getTotalPrice()) {
+                System.out.println("Uang tidak cukup!");
+                CLIHelper.pressEnter();
+                return;
+            }
+            
+            int change = payment - transaction.getTotalPrice();
+            System.out.println("Kembalian: Rp " + change);
+            
+            // Update stok dan simpan transaksi
+            for (TransactionItem item : transaction.getItems()) {
+                Product p = item.getProduct();
+                p.setStock(p.getStock() - item.getQuantity());
+                productService.updateProduct(p);
+            }
+            
+            transactionService.addTransaction(transaction);
+            System.out.println("\nTransaksi berhasil!");
+            
+        } catch (InputMismatchException e) {
+            System.out.println("Input tidak valid!");
+            scanner.nextLine();
+        }
+        
+        CLIHelper.pressEnter();
+    }

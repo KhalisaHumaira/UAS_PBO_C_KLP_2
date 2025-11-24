@@ -68,4 +68,14 @@ public class Product {
     public void setCategory(String category) {
         this.category = category;
     }
-
+/**
+     * Method untuk mengurangi stok produk
+     * @param quantity Jumlah yang dikurangi
+     * @throws Exception Jika stok tidak mencukupi
+     */
+    public void reduceStock(int quantity) throws Exception {
+        if (quantity > this.stock) {
+            throw new Exception("Stok tidak mencukupi!");
+        }
+        this.stock -= quantity;
+    }

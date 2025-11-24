@@ -258,3 +258,116 @@ public class Main {
         }
         CLIHelper.pressEnter();
     }
+     /**
+     * Menambah produk baru
+     */
+    private static void addProduct() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("TAMBAH PRODUK");
+        
+        try {
+            System.out.print("ID Produk: ");
+            String id = scanner.nextLine();
+            System.out.print("Nama Produk: ");
+            String name = scanner.nextLine();
+            System.out.print("Harga: ");
+            int price = scanner.nextInt();
+            System.out.print("Stok: ");
+            int stock = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Kategori: ");
+            String category = scanner.nextLine();
+            
+            Product product = new Product(id, name, price, stock, category);
+            if (productService.addProduct(product)) {
+                System.out.println("\nProduk berhasil ditambahkan!");
+            } else {
+                System.out.println("\nID produk sudah ada!");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Input tidak valid!");
+            scanner.nextLine();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        CLIHelper.pressEnter();
+    }
+
+    /**
+     * Edit produk
+     */
+    private static void editProduct() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("EDIT PRODUK");
+        
+        try {
+            System.out.print("ID Produk yang akan diedit: ");
+            String id = scanner.nextLine();
+            
+            Product product = productService.getProductById(id);
+            if (product == null) {
+                System.out.println("Produk tidak ditemukan!");
+                CLIHelper.pressEnter();
+                return;
+            }
+            
+            System.out.println("\nData saat ini:");
+            System.out.println("Nama: " + product.getName());
+            System.out.println("Harga: " + product.getPrice());
+            System.out.println("Stok: " + product.getStock());
+            System.out.println("Kategori: " + product.getCategory());
+            
+            System.out.print("\nNama baru (enter untuk skip): ");
+            String name = scanner.nextLine();
+            if (!name.isEmpty()) product.setName(name);
+            
+            System.out.print("Harga baru (0 untuk skip): ");
+            int price = scanner.nextInt();
+            if (price > 0) product.setPrice(price);
+            
+            System.out.print("Stok baru (-1 untuk skip): ");
+            int stock = scanner.nextInt();
+            if (stock >= 0) product.setStock(stock);
+            
+            scanner.nextLine();
+            System.out.print("Kategori baru (enter untuk skip): ");
+            String category = scanner.nextLine();
+            if (!category.isEmpty()) product.setCategory(category);
+            
+            productService.updateProduct(product);
+            System.out.println("\nProduk berhasil diupdate!");
+        } catch (InputMismatchException e) {
+            System.out.println("Input tidak valid!");
+            scanner.nextLine();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        CLIHelper.pressEnter();
+    }
+
+    /**
+     * Hapus produk
+     */
+    private static void deleteProduct() {
+        CLIHelper.clearScreen();
+        CLIHelper.printHeader("HAPUS PRODUK");
+        
+        try {
+            System.out.print("ID Produk yang akan dihapus: ");
+            String id = scanner.nextLine();
+            
+            System.out.print("Yakin ingin menghapus? (y/n): ");
+            String confirm = scanner.nextLine();
+            
+            if (confirm.equalsIgnoreCase("y")) {
+                if (productService.deleteProduct(id)) {
+                    System.out.println("\nProduk berhasil dihapus!");
+                } else {
+                    System.out.println("\nProduk tidak ditemukan!");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        CLIHelper.pressEnter();
+    }

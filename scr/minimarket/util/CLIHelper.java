@@ -27,3 +27,43 @@ public class CLIHelper {
             }
         }
     }
+
+
+    /**
+     * Print header dengan border
+     */
+    public static void printHeader(String title) {
+        printSeparator();
+        System.out.println(centerText(title, 50));
+        printSeparator();
+    }
+
+    /**
+     * Print separator line
+     */
+    public static void printSeparator() {
+        System.out.println("==================================================");
+    }
+
+    /**
+     * Print separator custom
+     */
+    public static void printSeparator(char character, int length) {
+        for (int i = 0; i < length; i++) {
+            System.out.print(character);
+        }
+        System.out.println();
+    }
+
+    /**
+     * Center text
+     */
+    public static String centerText(String text, int width) {
+        int padding = (width - text.length()) / 2;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < padding; i++) {
+            sb.append(" ");
+        }
+        sb.append(text);
+        return sb.toString();
+    }
